@@ -2,10 +2,9 @@ package loicMangele.Direct237_20.services;
 
 
 
+import loicMangele.Direct237_20.dto.AdminDTO;
 import loicMangele.Direct237_20.entities.Admin;
-import loicMangele.Direct237_20.exceptions.AdminNotFoundByEmailException;
-import loicMangele.Direct237_20.exceptions.AdminNotFoundByIdException;
-import loicMangele.Direct237_20.exceptions.AdminNotFoundByNameException;
+import loicMangele.Direct237_20.exceptions.*;
 import loicMangele.Direct237_20.repositories.AdminRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,12 +23,24 @@ public class AdminService {
 
 
 
-    public Admin createAdmin(Admin admin) {
+    public Admin createAdmin(AdminDTO body) {
+        this.adminRepo.findAdminByNom(body.nom()).ifPresent(existingAdmin -> {
+            throw new BadRequestException("Le nom " + body.nom() + " est dejà utilisé");
+        });
 
-        admin.setPassword(admin.getPassword());
-        return adminRepo.save(admin);
+        this.adminRepo.findAdminByEmail(body.email()).ifPresent(
+                existingUser -> {
+                    throw new BadRequestException("L'adress email " + body.email() + " est dejà utilisé");
+                }
+        );
+
+        Admin admin = new Admin();
+        admin.setNom(body.nom());
+        admin.setEmail(body.email());
+        admin.setPassword(body.password());
+
+        return this.adminRepo.save(admin);
     }
-
 
 
     public Admin findAdminByEmail(String email) {
@@ -52,18 +63,19 @@ public class AdminService {
         return adminRepo.findAll(pageable);
     }
 
-    public Admin updateAdmin(Long id, Admin updatedAdmin) {
-        Admin existingAdmin = findAdminById(id);
-        existingAdmin.setNom(updatedAdmin.getNom());
-        existingAdmin.setEmail(updatedAdmin.getEmail());
+    public Admin updateAdmin(Long id, AdminDTO body) {
+        return adminRepo.findById(id).map(admin -> {
+            if (body.nom() != null) admin.setNom(body.nom());
+            if (body.email() != null) admin.setEmail(body.email());
+            if (body.password() != null && !body.password().isBlank()) {
+                admin.setPassword(body.password());
+            }
 
 
-        if (!updatedAdmin.getPassword().equals(existingAdmin.getPassword())) {
-            existingAdmin.setPassword(updatedAdmin.getPassword());
-        }
-
-        return adminRepo.save(existingAdmin);
+            return adminRepo.save(admin);
+        }).orElseThrow(() -> new AdminNotFoundException(id));
     }
+
 
 
     public void deleteAdmin(Long id) {

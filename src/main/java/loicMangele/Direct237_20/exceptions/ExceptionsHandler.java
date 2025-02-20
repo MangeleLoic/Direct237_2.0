@@ -29,4 +29,67 @@ public class ExceptionsHandler {
     public ErrorsResponseDTO handleForbidden(AuthorizationDeniedException ex) {
         return new ErrorsResponseDTO("Non hai i permessi per accedere", LocalDateTime.now());
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
+    public ErrorsResponseDTO handleGeneric(Exception ex) {
+        ex.printStackTrace();
+        return new ErrorsResponseDTO("Problema lato server! Giuro che risolveremo presto!", LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AdminNotFoundByEmailException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleAdminNotFoundByEmail(AdminNotFoundByEmailException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AdminNotFoundByIdException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleAdminNotFoundById(AdminNotFoundByIdException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AdminNotFoundByNameException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleAdminNotFoundByName(AdminNotFoundByNameException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ClientNotFoundByIdException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleClientNotFoundById(ClientNotFoundByIdException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ReservationNotFoundByClientException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleReservationNotFoundByClient(ReservationNotFoundByClientException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ReservationNotFoundByIdException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleReservationNotFoundById(ReservationNotFoundByIdException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ReservationNotFoundByTrackingException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleReservationNotFoundByTracking(ReservationNotFoundByTrackingException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ReservationNotFoundByVoyageException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleReservationNotFoundByVoyage(ReservationNotFoundByVoyageException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(VoyageNotFoundByIdException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    public ErrorsResponseDTO handleVoyageNotFoundById(VoyageNotFoundByIdException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+
 }

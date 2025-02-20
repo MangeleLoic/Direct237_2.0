@@ -1,6 +1,7 @@
 package loicMangele.Direct237_20.controllers;
 
 
+import loicMangele.Direct237_20.dto.AdminDTO;
 import loicMangele.Direct237_20.entities.Admin;
 import loicMangele.Direct237_20.exceptions.BadRequestException;
 import loicMangele.Direct237_20.services.AdminService;
@@ -36,7 +37,7 @@ public class AdminController {
     // POST http://localhost:3001/admins (+ req.body)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Admin createAdmin(@RequestBody Admin admin, BindingResult validationResult) {
+    public Admin createAdmin(@RequestBody AdminDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             String message = validationResult.getAllErrors()
                     .stream()
@@ -44,12 +45,12 @@ public class AdminController {
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Dati non validi: " + message);
         }
-        return adminService.createAdmin(admin);
+        return adminService.createAdmin(body);
     }
 
     // PUT http://localhost:3001/admins/{id} (+ req.body)
     @PutMapping("/{id}")
-    public Admin updateAdmin(@PathVariable Long id, @RequestBody Admin updatedAdmin, BindingResult validationResult) {
+    public Admin updateAdmin(@PathVariable Long id, @RequestBody AdminDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             String message = validationResult.getAllErrors()
                     .stream()
@@ -57,7 +58,7 @@ public class AdminController {
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Dati non validi: " + message);
         }
-        return adminService.updateAdmin(id, updatedAdmin);
+        return adminService.updateAdmin(id, body);
     }
 
     // DELETE http://localhost:3001/admins/{id}
