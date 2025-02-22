@@ -2,15 +2,21 @@ package loicMangele.Direct237_20.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "admins")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
+
 @ToString
-public class Admin {
+public class Admin implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +29,21 @@ public class Admin {
 
     @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public Admin(String nom, String email, String password) {
+        this.nom = nom;
+        this.email = email;
+        this.password = password;
+        this.role = Role.COLLAB;
+    }
+
+    public Admin() {
+
+    }
+
 
     public void setNom(String nom) {
         this.nom = nom;
@@ -52,7 +73,17 @@ public class Admin {
         return email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.role.name()));
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.getEmail();
     }
 }

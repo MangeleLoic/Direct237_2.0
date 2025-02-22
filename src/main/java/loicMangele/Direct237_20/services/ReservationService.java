@@ -35,15 +35,21 @@ public class ReservationService {
             throw new BadRequestException("Une réservation avec le numéro de suivi " + body.trackingNumber() + " existe déjà.");
         });
 
-
         Optional<Client> optionalClient = clientRepo.findByNomClientAndNumeroTelephone(body.nomClient(), body.telephoneClient());
         Client client = optionalClient.orElseGet(() -> {
-
             Client newClient = new Client();
             newClient.setNomClient(body.nomClient());
             newClient.setNumeroTelephone(body.telephoneClient());
             return clientRepo.save(newClient);
         });
+
+        Voyage voyage = voyageRepo.findById(body.voyageId())
+                .orElseThrow(() -> new VoyageNotFoundByIdException("Voyage introuvable avec l'ID : " + body.voyageId()));
+
+
+        if (body.poids() > voyage.getKilosDisponibles()) {
+            throw new BadRequestException("Impossible de réserver : il ne reste que " + voyage.getKilosDisponibles() + " kg disponibles.");
+        }
 
 
         Reservation reservation = new Reservation();
@@ -51,16 +57,16 @@ public class ReservationService {
         reservation.setNomClient(body.nomClient());
         reservation.setTelephoneClient(body.telephoneClient());
         reservation.setTrackingNumber(body.trackingNumber());
-
-
-        Voyage voyage = voyageRepo.findById(body.voyageId())
-                .orElseThrow(() -> new VoyageNotFoundByIdException("Voyage introuvable avec l'ID : " + body.voyageId()));
-
         reservation.setVoyage(voyage);
         reservation.setContenu(body.contenu());
         reservation.setPoids(body.poids());
         reservation.setVille(body.ville());
 
+
+        voyage.setKilosReservees(voyage.getKilosReservees() + body.poids());
+        voyage.setKilosDisponibles(voyage.getKilosDisponibles() - body.poids());
+
+        voyageRepo.save(voyage);
         return reservationRepo.save(reservation);
     }
 

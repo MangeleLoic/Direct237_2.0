@@ -13,13 +13,12 @@ import java.util.Date;
 public class JWT {
     @Value("${jwt.secret}")
     private String secret;
-
-    public String createToken(Admin admin){
+    public String createToken(Admin admin) {
         return Jwts.builder()
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .subject(String.valueOf(admin.getId()))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))  
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
 
@@ -31,5 +30,9 @@ public class JWT {
         } catch (Exception ex) {
             throw new UnauthorizedException("Problemi con il token! Per favore effettua di nuovo il login!");
         }
+    }
+    public String getIdFromToken(String accessToken){
+        return Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parseSignedClaims(accessToken)
+                .getPayload().getSubject();
     }
 }
