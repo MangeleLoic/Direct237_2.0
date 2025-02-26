@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,6 +21,9 @@ public class AdminService {
 
     @Autowired
     private AdminRepo adminRepo;
+
+    @Autowired
+    private PasswordEncoder bcrypt;
 
 
 
@@ -34,10 +38,11 @@ public class AdminService {
                 }
         );
 
+
         Admin admin = new Admin();
         admin.setNom(body.nom());
         admin.setEmail(body.email());
-        admin.setPassword(body.password());
+        admin.setPassword(bcrypt.encode(body.password()));
 
         return this.adminRepo.save(admin);
     }

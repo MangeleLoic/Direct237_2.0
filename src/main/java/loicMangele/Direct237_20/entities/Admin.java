@@ -1,5 +1,6 @@
 package loicMangele.Direct237_20.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,9 +14,8 @@ import java.util.List;
 @Table(name = "admins")
 @Getter
 @Setter
-
-
 @ToString
+@JsonIgnoreProperties({"password", "authorities", "accountNonLocked", "accountNonExpired", "credentialsNonExpired", "enabled", })
 public class Admin implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,10 +73,14 @@ public class Admin implements UserDetails {
         return email;
     }
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.role.name()));
+        return role != null
+                ? List.of(new SimpleGrantedAuthority(role.name()))
+                : List.of();
     }
+
 
     public String getPassword() {
         return password;
